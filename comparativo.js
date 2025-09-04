@@ -39,11 +39,21 @@ async function loadChart(){
   const ctx = document.getElementById('chartCmp');
   if(window.Chart){
     if(window._chartCmp) window._chartCmp.destroy();
-    window._chartCmp = new Chart(ctx, {
-      type:'bar',
-      data:{ labels: semanas.map(s=>'Semana '+s), datasets },
-      options:{ responsive:true }
-    });
+    
+window._chartCmp = new Chart(ctx, {
+  type:'bar',
+  data:{ labels: semanas.map(s=>'Semana '+s), datasets },
+  options:{
+    responsive:true,
+    plugins:{
+      datalabels:{ anchor:'end', align:'start', color:'#000', font:{weight:'bold'} }
+    }
+  },
+  plugins:[ChartDataLabels]
+});
+const total = Array.from(byWeek.values()).reduce((acc,o)=> acc + Object.values(o).reduce((a,b)=>a+b,0),0);
+document.getElementById('totalLavagensCmp').textContent = 'Total de lavagens: '+total;
+
   }
 }
 

@@ -323,18 +323,24 @@ function initMenos2Toggle(){
       return rows;
     }catch(e){ console.error(e); return []; }
   }
-  async function drawProdInline(){
+  
+async function drawProdInline(){
     const rows = await fetchMonthRows();
-    const counts=[0,0,0];
-    rows.forEach(r=> counts[periodIdxFromDate(r.created)]++);
-    const diasNoMes = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
-    const medias = counts.map(c=> c/Math.max(1,diasNoMes));
+    const now = new Date();
+    const diasNoMes = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    const counts = new Array(diasNoMes).fill(0);
+    rows.forEach(r=>{
+      const d = r.created.getDate();
+      counts[d-1]++;
+    });
     const ctx = document.getElementById('chartProdInline');
     if(window.Chart && ctx){
       if(window._chartProdInline) window._chartProdInline.destroy();
       window._chartProdInline = new Chart(ctx, {
         type:'bar',
-        data:{ labels:['Manhã','Tarde','Noite'], datasets:[{ label:'Média/dia (mês)', data: medias }] }
+        data:{ labels: counts.map((_,i)=>String(i+1)), datasets:[{ label:'Lavagens por dia', data: counts, backgroundColor:'#4e79a7', barThickness:20 }] },
+        options:{ responsive:true, plugins:{ datalabels:{ anchor:'end', align:'start', color:'#000' } } },
+        plugins:[ChartDataLabels]
       });
     }
   }
@@ -350,3 +356,19 @@ function initMenos2Toggle(){
   });
 })();
 ;
+
+// === Injected: soma total no card Total do mês ===
+(async function(){
+  try{
+    const { colRelatorios, query, where, getDocs } = await import('./firebase.js');
+    function toYMD(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,'0')+"-"+String(dt.getDate()).padStart(2,'0'); }
+    const now = new Date();
+    const from = new Date(now.getFullYear(), now.getMonth(), 1);
+    const to = new Date(now.getFullYear(), now.getMonth()+1, 1);
+    const q1 = query(colRelatorios, where('data','>=', toYMD(from)), where('data','<', toYMD(to)));
+    const snap = await getDocs(q1);
+    let total=0; snap.forEach(()=>total++);
+    const el = document.getElementById('somaTotalMes');
+    if(el) el.textContent = "Soma total de lavagens no mês: "+total;
+  }catch(e){ console.error(e); }
+})();

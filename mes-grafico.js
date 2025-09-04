@@ -38,13 +38,28 @@ async function drawChart(){
   const ctx = document.getElementById('chartMes');
   if(window.Chart){
     if(window._chartMes) window._chartMes.destroy();
-    window._chartMes = new Chart(ctx, {
-      type:'bar',
-      data:{
-        labels:['Simples','Higienização','Exceções','Total'],
-        datasets:[{ label:'Lavagens no mês', data: [data.simples, data.hig, data.exc, data.total] }]
-      }
-    });
+    
+window._chartMes = new Chart(ctx, {
+  type:'bar',
+  data:{
+    labels:['Simples','Higienização','Exceções','Total'],
+    datasets:[{
+      label:'Lavagens no mês',
+      data:[data.simples, data.hig, data.exc, data.total],
+      backgroundColor:['#4e79a7','#f28e2b','#e15759','#76b7b2'],
+      barThickness:30
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{
+      datalabels:{ anchor:'end', align:'start', color:'#000', font:{weight:'bold'} }
+    }
+  },
+  plugins:[ChartDataLabels]
+});
+document.getElementById('totalLavagensMes').textContent = 'Total de lavagens: '+data.total;
+
   }
   return data;
 }
