@@ -39,6 +39,7 @@ async function drawChart(){
   if(window.Chart){
     if(window._chartMes) window._chartMes.destroy();
     
+
 window._chartMes = new Chart(ctx, {
   type:'bar',
   data:{
@@ -47,22 +48,16 @@ window._chartMes = new Chart(ctx, {
       label:'Lavagens no mês',
       data:[data.simples, data.hig, data.exc, data.total],
       backgroundColor:['#4e79a7','#f28e2b','#e15759','#76b7b2'],
-      barThickness:30
+      barThickness: 28
     }]
   },
   options:{
     responsive:true,
-    plugins:{
-      datalabels:{ anchor:'end', align:'start', color:'#000', font:{weight:'bold'} }
-    }
+    plugins:{ datalabels:{ anchor:'end', align:'start' } }
   },
   plugins:[ChartDataLabels]
 });
-document.getElementById('totalLavagensMes').textContent = 'Total de lavagens: '+data.total;
 
-  }
-  return data;
-}
 
 async function exportPPT(){
   const data = await drawChart();
@@ -84,3 +79,7 @@ async function exportPPT(){
 document.getElementById('btnAtualizarMes').addEventListener('click', drawChart);
 document.getElementById('btnExportPptMes').addEventListener('click', exportPPT);
 document.addEventListener('DOMContentLoaded', ()=>{ setDefaultMonth(); drawChart(); });
+
+try{
+  document.getElementById('totalLavagensMes').textContent = 'Total de lavagens: ' + data.total;
+}catch(e){}

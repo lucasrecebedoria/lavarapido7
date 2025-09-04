@@ -324,26 +324,64 @@ function initMenos2Toggle(){
     }catch(e){ console.error(e); return []; }
   }
   
+
 async function drawProdInline(){
+    // Busca lavagens do mês atual e agrupa por dia
+    async function fetchMonthRows(){
+      try{
+        const { colRelatorios, query, where, getDocs } = await import('./firebase.js');
+        const now = new Date();
+        const from = new Date(now.getFullYear(), now.getMonth(), 1);
+        const to = new Date(now.getFullYear(), now.getMonth()+1, 1);
+        const toYMD = (dt)=> dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,'0')+"-"+String(dt.getDate()).padStart(2,'0');
+        const q1 = query(colRelatorios, where('data','>=', toYMD(from)), where('data','<', toYMD(to)));
+        const snap = await getDocs(q1);
+        const rows = [];
+        snap.forEach(ss=>{
+          const d = ss.data();
+          const created = d.created_at ? (typeof d.created_at.toDate === 'function' ? d.created_at.toDate() : new Date(d.created_at)) : new Date(d.data+"T00:00:00");
+          rows.push({ created });
+        });
+        return rows;
+      }catch(e){ console.error(e); return []; }
+    }
     const rows = await fetchMonthRows();
     const now = new Date();
     const diasNoMes = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
     const counts = new Array(diasNoMes).fill(0);
-    rows.forEach(r=>{
-      const d = r.created.getDate();
-      counts[d-1]++;
-    });
+    rows.forEach(r=>{ const d = r.created.getDate(); if(d>=1 && d<=diasNoMes) counts[d-1]++; });
     const ctx = document.getElementById('chartProdInline');
     if(window.Chart && ctx){
       if(window._chartProdInline) window._chartProdInline.destroy();
       window._chartProdInline = new Chart(ctx, {
         type:'bar',
-        data:{ labels: counts.map((_,i)=>String(i+1)), datasets:[{ label:'Lavagens por dia', data: counts, backgroundColor:'#4e79a7', barThickness:20 }] },
-        options:{ responsive:true, plugins:{ datalabels:{ anchor:'end', align:'start', color:'#000' } } },
+        data:{
+          labels: counts.map((_,i)=> String(i+1)),
+          datasets:[{ 
+            label:'Lavagens por dia', 
+            data: counts, 
+            backgroundColor: '#4e79a7', 
+            barThickness: 14 
+          }]
+        },
+        options:{
+          responsive:true,
+          plugins:{ datalabels:{ anchor:'end', align:'start', formatter:(v)=> v>0?v:"", font:{weight:'bold'} } },
+          scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }
+        },
         plugins:[ChartDataLabels]
       });
     }
-  }
+    const total = counts.reduce((a,b)=>a+b,0);
+    const info = document.getElementById('totalLavagensProd');
+    if(info) info.textContent = "Total de lavagens no mês: " + total;
+},
+        plugins:[ChartDataLabels]
+      });
+    }
+  }catch(e){ console.error(e); }
+}
+
   document.getElementById('btnToggleProdInline')?.addEventListener('click', ()=>{
     const box = document.getElementById('prodInline');
     if(!box) return;
@@ -371,4 +409,23 @@ async function drawProdInline(){
     const el = document.getElementById('somaTotalMes');
     if(el) el.textContent = "Soma total de lavagens no mês: "+total;
   }catch(e){ console.error(e); }
+})();
+
+
+// === Injected: soma total no mês (DOM only) ===
+(function(){
+  function fillSomaTotalMes(){
+    try{
+      const s = parseInt(document.getElementById('cntSimples')?.textContent||'0',10);
+      const h = parseInt(document.getElementById('cntHig')?.textContent||'0',10);
+      const e = parseInt(document.getElementById('cntExc')?.textContent||'0',10);
+      const total = s+h+e;
+      const el = document.getElementById('somaTotalMes');
+      if(el) el.textContent = "Soma total de lavagens no mês: " + total;
+    }catch(err){ console.error(err); }
+  }
+  document.addEventListener('DOMContentLoaded', fillSomaTotalMes);
+  // Reaplicar quando os contadores forem atualizados dinamicamente
+  const obs = new MutationObserver(fillSomaTotalMes);
+  obs.observe(document.body, { childList:true, subtree:true });
 })();
