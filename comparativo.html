@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MoveBuss • Comparativo Semanas</title>
+<link rel="icon" href="./assets/favicon.ico" />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="left">
+      <a href="./monthly.html" class="metal btn-outline">← Voltar</a>
+    </div>
+    <div class="spacer"></div>
+    <div class="right">
+      <div class="badge">Comparativo por semana</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <div class="form" style="display:flex;gap:8px;flex-wrap:wrap">
+        <label>Selecione o mês:</label>
+        <input id="mesInputCmp" type="month" class="metal btn-outline" />
+      </div>
+      <div id="areaCmp">
+        <div id="totalLavagensCmp" class="small" style="margin:8px 0;font-weight:bold"></div>
+        <canvas id="chartCmp" width="640" height="320"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <footer>Developed by Lucas L Custodio, V1</footer>
+  <script type="module" src="./comparativo.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+</body>
+</html>

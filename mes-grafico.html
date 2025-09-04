@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MoveBuss • Gráfico do Mês</title>
+<link rel="icon" href="./assets/favicon.ico" />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="left">
+      <a href="./app.html" class="metal btn-outline">← Voltar</a>
+    </div>
+    <div class="spacer"></div>
+    <div class="right">
+      <div class="badge">Gráfico do mês</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <div class="form" style="display:flex;gap:8px;flex-wrap:wrap">
+        <label>Mês: </label>
+        <input id="mesInputMes" type="month" class="metal btn-outline" />
+        <button id="btnAtualizarMes" class="metal btn-outline">Atualizar</button>
+        <button id="btnExportPptMes" class="metal btn-outline">Exportar PPT</button>
+      </div>
+      <div id="areaMes">
+        <div id="totalLavagensMes" class="small" style="margin:8px 0;font-weight:bold"></div>
+        <canvas id="chartMes" width="640" height="320"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <footer>Developed by Lucas L Custodio, V1</footer>
+  <script type="module" src="./mes-grafico.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.min.js"></script>
+</body>
+</html>
