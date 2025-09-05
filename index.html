@@ -1,60 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>MoveBuss • Login</title>
-<link rel="icon" href="./assets/favicon.ico" />
-<link rel="stylesheet" href="./styles.css" />
+  <meta charset="UTF-8">
+  <title>Lava Rápido - Relatórios</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="header">
-    <div class="left">
-      <img src="./assets/logo.png" class="logo" alt="MoveBuss"/>
-      <h3 class="small">Controle de Lavagem</h3>
-    </div>
-    <div class="spacer"></div>
+  <header>
+    <h1>Relatórios - Lava Rápido</h1>
+    <button id="btnLogout">Sair</button>
+    <button id="btnChangePwd">Alterar Senha</button>
   </header>
 
-  <main class="container" style="max-width:520px; margin-top:40px;">
-    <div class="card">
-      <h2 class="center">Acesso</h2>
-      <form id="loginForm" class="form">
-        <div>
-          <div class="label">Matrícula</div>
-          <input id="matricula" class="input" required placeholder="Ex.: 55 001 ou 6266"/>
-        </div>
-        <div>
-          <div class="label">Senha</div>
-          <input id="senha" class="input" type="password" required />
-        </div>
-        <button class="metal" style="width:100%" type="submit">Entrar</button>
+  <main>
+    <section>
+      <h2>Novo Registro</h2>
+      <form id="washForm">
+        <input type="number" id="prefixo" placeholder="Prefixo" required>
+        <select id="tipo">
+          <option value="Lavagem Simples">Lavagem Simples</option>
+          <option value="Higienização">Higienização</option>
+          <option value="Exceção">Exceção</option>
+        </select>
+        <input type="date" id="data">
+        <button type="submit">Salvar</button>
+        <span id="saveMsg"></span>
       </form>
-      <p class="small" style="margin-top:10px">Não tem conta? <a class="small link" href="./register.html">Registrar</a></p>
-      <p class="small" id="msg" style="color:#ff9b9b"></p>
-    </div>
+    </section>
+
+    <section>
+      <h2>Relatório Semanal</h2>
+      <input type="text" id="filtroPrefixo" placeholder="Filtrar prefixo">
+      <input type="number" id="filtroMinCount" placeholder="Mínimo lavagens">
+      <button id="btnWeeklyPdf">Exportar PDF</button>
+      <button id="btnWeeklyExcel">Exportar Excel</button>
+      <table id="tabelaSemanal">
+        <thead>
+          <tr><th>Data</th><th>Hora</th><th>Prefixo</th><th>Tipo</th><th>Usuário</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>
+        Atenção • Prefixos com < 2 lavagens na semana
+        <button id="toggleMenos2">▾</button>
+      </h2>
+      <div id="painelScroll">
+        <input type="text" id="filtroMenos2" placeholder="Filtrar prefixo">
+        <table id="tabelaMenos2">
+          <thead>
+            <tr><th>Prefixo</th><th>Qtd</th><th>Ação</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Totais do mês</h2>
+      <p>Simples: <span id="cntSimples">0</span></p>
+      <p>Higienização: <span id="cntHig">0</span></p>
+      <p>Exceções: <span id="cntExc">0</span></p>
+      <canvas id="chartProdInline" height="120"></canvas>
+      <p id="totalLavagensProd"></p>
+      <button id="btnGraficoTotaisMes">Ver Gráfico</button>
+      <button id="btnPPTTotaisMes">Gerar PPT</button>
+      <button id="btnComparativoSemanas">Comparativo Semanas</button>
+    </section>
   </main>
 
-  <footer>Developed by Lucas L Custodio, V1</footer>
-
-<script type="module">
-import { auth, signInWithEmailAndPassword } from './firebase.js';
-
-const form = document.getElementById('loginForm');
-const msg = document.getElementById('msg');
-form.addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  msg.textContent='';
-  const matricula = document.getElementById('matricula').value.trim();
-  const senha = document.getElementById('senha').value;
-  const email = `${matricula}@movebuss.local`;
-  try{
-    await signInWithEmailAndPassword(auth, email, senha);
-    location.href='app.html';
-  }catch(err){
-    msg.textContent = err.message;
-  }
-});
-</script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
